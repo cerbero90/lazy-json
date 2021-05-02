@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name=":package_name">
-    <description>The coding standard of :package_name package</description>
+<ruleset name="lazy-json">
+    <description>The coding standard of lazy-json package</description>
     <arg value="p" />
 
     <config name="ignore_warnings_on_exit" value="1" />
