@@ -26,15 +26,7 @@ composer require cerbero/lazy-json
 
 ## Usage
 
-1. Initialize Git
-2. Run `php prefill.php`
-3. Delete `prefill.php`
-4. Review versions of PHP and Laravel to support in [composer.json](composer.json), [build.yml](.github/workflows/build.yml) and [README badges](README.md)
-5. Push the master branch
-6. Submit package to [Packagist](https://packagist.org/packages/submit)
-7. Add repository to [Scrutinizer](https://scrutinizer-ci.com/g/new)
-8. Initialize GitFlow
-9. Happy coding!
+@todo document usage
 
 ## Change log
 
