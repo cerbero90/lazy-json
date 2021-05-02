@@ -20,7 +20,11 @@
     }],
     "require": {
         "php": "^7.2||^8.0",
+        "halaxa/json-machine": "^0.6.1",
         "illuminate/support": ">=6.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Required to load JSON from endpoints (^7.0)."
     },
     "require-dev": {
         "orchestra/testbench": ">=3.9",
@@ -30,7 +34,10 @@
     "autoload": {
         "psr-4": {
             "Cerbero\\LazyJson\\": "src"
-        }
+        },
+        "files": [
+            "helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
