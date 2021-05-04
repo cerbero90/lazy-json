@@ -2,6 +2,7 @@
 
 namespace Cerbero\LazyJson\Handlers;
 
+use Cerbero\LazyJson\Concerns\EndpointAware;
 use GuzzleHttp\Client;
 use Traversable;
 
@@ -9,43 +10,58 @@ use Traversable;
  * The endpoint handler.
  *
  */
-class Endpoint extends AbstractHandler
+class Endpoint extends Psr7Message
 {
+    use EndpointAware;
+
     /**
-     * Determine whether the handler should handle the source
+     * The HTTP client.
      *
-     * @return bool
+     * @var Client
      */
-    protected function shouldHandleSource(): bool
+    private $client;
+
+    /**
+     * Instantiate the class.
+     *
+     * @param Client $client
+     */
+    public function __construct(Client $client = null)
     {
-        if (!is_string($this->source)) {
-            return false;
+        if ($client === null && class_exists(Client::class)) {
+            $client = new Client();
         }
 
-        if (false === $url = parse_url($this->source)) {
-            return false;
-        }
-
-        return in_array($url['scheme'] ?? null, ['http', 'https']) && isset($url['host']);
+        $this->client = $client;
     }
 
     /**
-     * Handle the source
+     * Determine whether the handler can handle the given source
      *
-     * @return Traversable|null
+     * @param mixed $source
+     * @return bool
      */
-    protected function handleSource(): ?Traversable
+    public function handles($source): bool
     {
-        if (!class_exists(Client::class)) {
-            return null;
-        }
+        return $this->isEndpoint($source) && class_exists(Client::class);
+    }
 
-        $this->source = (new Client())->get($this->source, [
+    /**
+     * Handle the given source
+     *
+     * @param mixed $source
+     * @param string $path
+     * @return Traversable
+     */
+    public function handle($source, string $path): Traversable
+    {
+        $response = $this->client->get($source, [
             'headers' => [
                 'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
             ],
         ]);
 
-        return null;
+        return parent::handle($response, $path);
     }
 }

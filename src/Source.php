@@ -23,13 +23,13 @@ class Source implements IteratorAggregate
     /**
      * The source handlers.
      *
-     * @var Handlers\AbstractHandler[]
+     * @var array
      */
     protected $handlers = [
         Handlers\Endpoint::class,
         Handlers\Filename::class,
-        Handlers\JsonString::class,
         Handlers\IterableSource::class,
+        Handlers\JsonString::class,
         Handlers\LaravelClientResponse::class,
         Handlers\Psr7Message::class,
         Handlers\Psr7Stream::class,
@@ -58,11 +58,12 @@ class Source implements IteratorAggregate
      */
     protected function toTraversable($source, string $path): Traversable
     {
-        foreach ($this->handlers as $handler) {
-            $result = $handler::of($source, $path)->handle();
+        foreach ($this->handlers as $class) {
+            /** @var Handlers\Handler $handler */
+            $handler = new $class();
 
-            if ($result instanceof Traversable) {
-                return $result;
+            if ($handler->handles($source)) {
+                return $handler->handle($source, $path);
             }
         }
 

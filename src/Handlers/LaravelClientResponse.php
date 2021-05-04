@@ -9,27 +9,28 @@ use Traversable;
  * The Laravel HTTP client response handler.
  *
  */
-class LaravelClientResponse extends AbstractHandler
+class LaravelClientResponse extends Psr7Message
 {
     /**
-     * Determine whether the handler should handle the source
+     * Determine whether the handler can handle the given source
      *
+     * @param mixed $source
      * @return bool
      */
-    protected function shouldHandleSource(): bool
+    public function handles($source): bool
     {
-        return $this->source instanceof Response;
+        return $source instanceof Response;
     }
 
     /**
-     * Handle the source
+     * Handle the given source
      *
-     * @return Traversable|null
+     * @param mixed $source
+     * @param string $path
+     * @return Traversable
      */
-    protected function handleSource(): ?Traversable
+    public function handle($source, string $path): Traversable
     {
-        $this->source = $this->source->toPsrResponse();
-
-        return null;
+        return parent::handle($source->toPsrResponse(), $path);
     }
 }

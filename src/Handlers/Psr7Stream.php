@@ -10,33 +10,36 @@ use Traversable;
  * The PSR-7 stream handler.
  *
  */
-class Psr7Stream extends AbstractHandler
+class Psr7Stream extends Resource
 {
     /**
-     * Determine whether the handler should handle the source
+     * Determine whether the handler can handle the given source
      *
+     * @param mixed $source
      * @return bool
      */
-    protected function shouldHandleSource(): bool
+    public function handles($source): bool
     {
-        return $this->source instanceof StreamInterface;
+        return $source instanceof StreamInterface;
     }
 
     /**
-     * Handle the source
+     * Handle the given source
      *
-     * @return Traversable|null
+     * @param mixed $source
+     * @param string $path
+     * @return Traversable
      */
-    protected function handleSource(): ?Traversable
+    public function handle($source, string $path): Traversable
     {
         if (!in_array(StreamWrapper::NAME, stream_get_wrappers())) {
             stream_wrapper_register(StreamWrapper::NAME, StreamWrapper::class);
         }
 
-        $this->source = fopen(StreamWrapper::NAME . '://stream', 'rb', false, stream_context_create([
-            StreamWrapper::NAME => ['stream' => $this->source],
+        $stream = fopen(StreamWrapper::NAME . '://stream', 'rb', false, stream_context_create([
+            StreamWrapper::NAME => ['stream' => $source],
         ]));
 
-        return null;
+        return parent::handle($stream, $path);
     }
 }

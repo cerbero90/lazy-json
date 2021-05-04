@@ -2,14 +2,13 @@
 
 namespace Cerbero\LazyJson\Handlers;
 
-use Psr\Http\Message\MessageInterface;
 use Traversable;
 
 /**
- * The PSR-7 message handler.
+ * The handler interface.
  *
  */
-class Psr7Message extends Psr7Stream
+interface Handler
 {
     /**
      * Determine whether the handler can handle the given source
@@ -17,10 +16,7 @@ class Psr7Message extends Psr7Stream
      * @param mixed $source
      * @return bool
      */
-    public function handles($source): bool
-    {
-        return $source instanceof MessageInterface;
-    }
+    public function handles($source): bool;
 
     /**
      * Handle the given source
@@ -29,8 +25,5 @@ class Psr7Message extends Psr7Stream
      * @param string $path
      * @return Traversable
      */
-    public function handle($source, string $path): Traversable
-    {
-        return parent::handle($source->getBody(), $path);
-    }
+    public function handle($source, string $path): Traversable;
 }

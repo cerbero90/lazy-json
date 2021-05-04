@@ -2,6 +2,7 @@
 
 namespace Cerbero\LazyJson\Handlers;
 
+use Cerbero\LazyJson\Concerns\JsonPointerAware;
 use JsonMachine\JsonMachine;
 use Traversable;
 
@@ -9,25 +10,30 @@ use Traversable;
  * The resource handler.
  *
  */
-class Resource extends AbstractHandler
+class Resource
 {
+    use JsonPointerAware;
+
     /**
-     * Determine whether the handler should handle the source
+     * Determine whether the handler can handle the given source
      *
+     * @param mixed $source
      * @return bool
      */
-    protected function shouldHandleSource(): bool
+    public function handles($source): bool
     {
-        return is_resource($this->source);
+        return is_resource($source);
     }
 
     /**
-     * Handle the source
+     * Handle the given source
      *
-     * @return Traversable|null
+     * @param mixed $source
+     * @param string $path
+     * @return Traversable
      */
-    protected function handleSource(): ?Traversable
+    public function handle($source, string $path): Traversable
     {
-        return JsonMachine::fromStream($this->source, $this->pointer());
+        return JsonMachine::fromStream($source, $this->toJsonPointer($path));
     }
 }
