@@ -13,7 +13,7 @@
 [![PSR-12][ico-psr12]][link-psr12]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Framework agnostic package to load heavy JSON in [lazy collections](https://laravel.com/docs/collections#lazy-collections).
+Framework agnostic package to load heavy JSON in [lazy collections](https://laravel.com/docs/collections#lazy-collections). Under the hood, the brilliant [JSON Machine](https://github.com/halaxa/json-machine) by [@halaxa](https://github.com/halaxa) is used as lexer and parser.
 
 
 ## Install
