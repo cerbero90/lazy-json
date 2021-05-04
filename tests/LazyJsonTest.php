@@ -5,6 +5,7 @@ namespace Cerbero\LazyJson;
 use Cerbero\LazyJson\Exceptions\LazyJsonException;
 use Cerbero\LazyJson\Providers\LazyJsonServiceProvider;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Http\Client\Response;
 use Orchestra\Testbench\TestCase;
@@ -67,6 +68,10 @@ class LazyJsonTest extends TestCase
      */
     public function lazyLoadsJsonFromLaravelClientResponse()
     {
+        if (!class_exists(Response::class)) {
+            $this->markTestSkipped('The Laravel HTTP client is not loaded.');
+        }
+
         $response = new Response(new Psr7Response(200, [], '{"status":"success"}'));
 
         lazyJson($response)->each(function ($value, $key) {
@@ -93,11 +98,11 @@ class LazyJsonTest extends TestCase
      */
     public function lazyLoadsJsonFromPsr7Stream()
     {
-        $stream = Utils::streamFor('{"stream":"ok"}');
+        $stream = new Stream(fopen(__DIR__ . '/stub.json', 'rb'));
 
         lazyJson($stream)->each(function ($value, $key) {
-            $this->assertSame('stream', $key);
-            $this->assertSame('ok', $value);
+            $this->assertSame('key', $key);
+            $this->assertSame('JSON file value', $value);
         });
     }
 
