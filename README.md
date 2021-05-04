@@ -13,20 +13,84 @@
 [![PSR-12][ico-psr12]][link-psr12]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Load heavy JSON in Laravel [lazy collections](https://laravel.com/docs/collections#lazy-collections).
+Framework agnostic package to load heavy JSON in [lazy collections](https://laravel.com/docs/collections#lazy-collections).
 
 
 ## Install
 
-Via Composer
+In a Laravel application, all you need to do is requiring the package:
 
 ``` bash
 composer require cerbero/lazy-json
 ```
 
+Otherwise, you also need to register the lazy collection macro manually:
+
+```php
+use Cerbero\LazyJson\Macro;
+use Illuminate\Support\LazyCollection;
+
+LazyCollection::macro('fromJson', new Macro());
+```
+
 ## Usage
 
-@todo document usage
+Loading JSON in lazy collections is possible by using the collection itself or the included helper:
+
+```php
+LazyCollection::fromJson($source);
+
+lazyJson($source);
+```
+
+The following are the supported JSON sources:
+
+```php
+$source = '{"foo":"bar"}'; // JSON string
+$source = ['{"foo":"bar"}']; // any iterable containing JSON, i.e. array or Traversable
+$source = 'https://foo.test/endpoint'; // endpoint
+$source = Http::get('https://foo.test/endpoint'); // Laravel HTTP client response
+$source = '/path/to/file.json'; // JSON file
+$source = fopen('/path/to/file.json', 'rb'); // any resource
+$source = <Psr\Http\Message\MessageInterface>; // any PSR-7 message, e.g. Guzzle response
+$source = <Psr\Http\Message\StreamInterface>; // any PSR-7 stream
+```
+
+Optionally, you can define a dot-noted path to extract only a sub-tree of the JSON. For example, given the following JSON:
+
+```json
+{
+    "data": [
+        {
+            "name": "Team 1",
+            "users": [
+                {
+                    "id": 1
+                },
+                {
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "Team 2",
+            "users": [
+                {
+                    "id": 3
+                }
+            ]
+        }
+    ]
+}
+```
+
+defining the path `data.*.users.*.id` would iterate only user IDs:
+
+```php
+lazyJson($source, 'data.*.users.*.id')
+    ->filter(fn ($id) => $id % 2 == 0)
+    ->all();
+```
 
 ## Change log
 
