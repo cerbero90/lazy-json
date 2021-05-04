@@ -27,6 +27,7 @@
         "guzzlehttp/guzzle": "Required to load JSON from endpoints (^7.0)."
     },
     "require-dev": {
+        "guzzlehttp/guzzle": "^7.0",
         "orchestra/testbench": ">=3.9",
         "phpunit/phpunit": ">=8.0",
         "squizlabs/php_codesniffer": "^3.0"
