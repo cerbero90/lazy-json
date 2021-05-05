@@ -11,7 +11,7 @@ use Traversable;
  * The JSON string handler.
  *
  */
-class JsonString
+class JsonString implements Handler
 {
     use EndpointAware;
     use JsonPointerAware;

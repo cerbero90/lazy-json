@@ -10,7 +10,7 @@ use Traversable;
  * The iterable source handler.
  *
  */
-class IterableSource
+class IterableSource implements Handler
 {
     use JsonPointerAware;
 

@@ -10,7 +10,7 @@ use Traversable;
  * The filename handler.
  *
  */
-class Filename
+class Filename implements Handler
 {
     use JsonPointerAware;
 

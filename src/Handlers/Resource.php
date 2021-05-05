@@ -10,7 +10,7 @@ use Traversable;
  * The resource handler.
  *
  */
-class Resource
+class Resource implements Handler
 {
     use JsonPointerAware;
 
