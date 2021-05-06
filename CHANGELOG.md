@@ -20,3 +20,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Security
 - Nothing
+
+
+## 1.0.0 - 2021-05-06
+
+### Added
+- First release

@@ -13,28 +13,72 @@
 [![PSR-12][ico-psr12]][link-psr12]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Load heavy JSON in Laravel [lazy collections](https://laravel.com/docs/collections#lazy-collections).
+Framework agnostic package to load heavy JSON in [lazy collections](https://laravel.com/docs/collections#lazy-collections). Under the hood, the brilliant [JSON Machine](https://github.com/halaxa/json-machine) by [@halaxa](https://github.com/halaxa) is used as lexer and parser.
 
 
 ## Install
 
-Via Composer
+In a Laravel application, all you need to do is requiring the package:
 
 ``` bash
 composer require cerbero/lazy-json
 ```
 
+Otherwise, you also need to register the lazy collection macro manually:
+
+```php
+use Cerbero\LazyJson\Macro;
+use Illuminate\Support\LazyCollection;
+
+LazyCollection::macro('fromJson', new Macro());
+```
+
 ## Usage
 
-1. Initialize Git
-2. Run `php prefill.php`
-3. Delete `prefill.php`
-4. Review versions of PHP and Laravel to support in [composer.json](composer.json), [build.yml](.github/workflows/build.yml) and [README badges](README.md)
-5. Push the master branch
-6. Submit package to [Packagist](https://packagist.org/packages/submit)
-7. Add repository to [Scrutinizer](https://scrutinizer-ci.com/g/new)
-8. Initialize GitFlow
-9. Happy coding!
+Loading JSON in lazy collections is possible by using the collection itself or the included helper:
+
+```php
+LazyCollection::fromJson($source);
+
+lazyJson($source);
+```
+
+The following are the supported JSON sources:
+
+```php
+$source = '{"foo":"bar"}'; // JSON string
+$source = ['{"foo":"bar"}']; // any iterable containing JSON, i.e. array or Traversable
+$source = 'https://foo.test/endpoint'; // endpoint
+$source = Http::get('https://foo.test/endpoint'); // Laravel HTTP client response
+$source = '/path/to/file.json'; // JSON file
+$source = fopen('/path/to/file.json', 'rb'); // any resource
+$source = <Psr\Http\Message\MessageInterface>; // any PSR-7 message, e.g. Guzzle response
+$source = <Psr\Http\Message\StreamInterface>; // any PSR-7 stream
+```
+
+Optionally, you can define a dot-noted path to extract only a sub-tree of the JSON. For example, given the following JSON:
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Team 1",
+        "users": [
+            {
+                "id": 1,
+                ...
+            },
+            ...
+        ]
+    }
+}
+```
+
+defining the path `data.users` would iterate only users:
+
+```php
+$users = lazyJson($source, 'data.users');
+```
 
 ## Change log
 
