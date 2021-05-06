@@ -40,6 +40,8 @@ class StreamWrapper
      * @param int $options
      * @param mixed $opened_path
      * @return bool
+     *
+     * @scrutinizer ignore-unused
      */
     public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
     {
