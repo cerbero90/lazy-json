@@ -60,36 +60,24 @@ Optionally, you can define a dot-noted path to extract only a sub-tree of the JS
 
 ```json
 {
-    "data": [
-        {
-            "name": "Team 1",
-            "users": [
-                {
-                    "id": 1
-                },
-                {
-                    "id": 2
-                }
-            ]
-        },
-        {
-            "name": "Team 2",
-            "users": [
-                {
-                    "id": 3
-                }
-            ]
-        }
-    ]
+    "data": {
+        "id": 1,
+        "name": "Team 1",
+        "users": [
+            {
+                "id": 1,
+                ...
+            },
+            ...
+        ]
+    }
 }
 ```
 
-defining the path `data.*.users.*.id` would iterate only user IDs:
+defining the path `data.users` would iterate only users:
 
 ```php
-lazyJson($source, 'data.*.users.*.id')
-    ->filter(fn ($id) => $id % 2 == 0)
-    ->all();
+$users = lazyJson($source, 'data.users');
 ```
 
 ## Change log
