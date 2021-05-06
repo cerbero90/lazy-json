@@ -20,6 +20,8 @@ trait JsonPointerAware
             return '';
         }
 
-        return '/' . str_replace(['~', '/', '.', '*'], ['~0', '~1', '/', '-'], $path);
+        // @todo replace * with - after https://github.com/halaxa/json-machine/pull/47 is merged:
+        // return '/' . str_replace(['~', '/', '.', '*'], ['~0', '~1', '/', '-'], $path);
+        return '/' . str_replace(['~', '/', '.'], ['~0', '~1', '/'], $path);
     }
 }
