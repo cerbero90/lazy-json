@@ -3,6 +3,7 @@
 namespace Cerbero\LazyJson\Handlers;
 
 use Cerbero\LazyJson\Concerns\EndpointAware;
+use Cerbero\LazyJson\Exceptions\LazyJsonException;
 use GuzzleHttp\Client;
 use Traversable;
 
@@ -15,27 +16,6 @@ class Endpoint extends Psr7Message
     use EndpointAware;
 
     /**
-     * The HTTP client.
-     *
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * Instantiate the class.
-     *
-     * @param Client $client
-     */
-    public function __construct(Client $client = null)
-    {
-        if ($client === null && class_exists(Client::class)) {
-            $client = new Client();
-        }
-
-        $this->client = $client;
-    }
-
-    /**
      * Determine whether the handler can handle the given source
      *
      * @param mixed $source
@@ -43,7 +23,7 @@ class Endpoint extends Psr7Message
      */
     public function handles($source): bool
     {
-        return $this->isEndpoint($source) && class_exists(Client::class);
+        return $this->isEndpoint($source);
     }
 
     /**
@@ -55,7 +35,11 @@ class Endpoint extends Psr7Message
      */
     public function handle($source, string $path): Traversable
     {
-        $response = $this->client->get($source, [
+        if (!$this->guzzleIsLoaded()) {
+            throw new LazyJsonException('Guzzle is required to load JSON from endpoints');
+        }
+
+        $response = (new Client())->get($source, [
             'headers' => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
@@ -63,5 +47,15 @@ class Endpoint extends Psr7Message
         ]);
 
         return parent::handle($response, $path);
+    }
+
+    /**
+     * Determine whether Guzzle is loaded, useful for testing
+     *
+     * @return bool
+     */
+    protected function guzzleIsLoaded(): bool
+    {
+        return class_exists(Client::class);
     }
 }

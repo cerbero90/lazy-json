@@ -2,16 +2,19 @@
 
 namespace Cerbero\LazyJson\Handlers;
 
+use Cerbero\LazyJson\Exceptions\LazyJsonException;
 use Cerbero\LazyJson\Handlers\Endpoint;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use JsonMachine\JsonMachine;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * The lazy JSON test.
  *
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class EndpointTest extends TestCase
 {
@@ -45,12 +48,11 @@ class EndpointTest extends TestCase
      */
     public function handleEndpoint()
     {
-        $double = m::mock(Client::class, [
+        m::mock('overload:' . Client::class, [
             'get' => new Psr7Response(200, [], '{"end":"point"}'),
         ]);
 
-        $handler = new Endpoint($double);
-        $handled = $handler->handle('https://endpoint.test', '');
+        $handled = (new Endpoint())->handle('https://endpoint.test', '');
 
         $this->assertInstanceOf(JsonMachine::class, $handled);
 
@@ -65,12 +67,11 @@ class EndpointTest extends TestCase
      */
     public function extractsJsonSubtrees()
     {
-        $double = m::mock(Client::class, [
+        m::mock('overload:' . Client::class, [
             'get' => new Psr7Response(200, [], '{"foo":{"bar":1,"baz":2}}'),
         ]);
 
-        $handler = new Endpoint($double);
-        $handled = $handler->handle('https://endpoint.test', 'foo.bar');
+        $handled = (new Endpoint())->handle('https://endpoint.test', 'foo.bar');
 
         $this->assertInstanceOf(JsonMachine::class, $handled);
 
@@ -78,5 +79,23 @@ class EndpointTest extends TestCase
             $this->assertSame('bar', $key);
             $this->assertSame(1, $value);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function failsIfGuzzleIsNotLoaded()
+    {
+        $double = m::mock(Endpoint::class)
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+            ->shouldReceive('guzzleIsLoaded')
+            ->once()
+            ->andReturn(false)
+            ->getMock();
+
+        $this->expectExceptionObject(new LazyJsonException('Guzzle is required to load JSON from endpoints'));
+
+        $double->handle('https://endpoint.test', 'foo.bar');
     }
 }
