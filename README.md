@@ -1,4 +1,4 @@
-# Lazy JSON
+# 🐼 Lazy JSON
 
 [![Author][ico-author]][link-author]
 [![PHP Version][ico-php]][link-php]
