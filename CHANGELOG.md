@@ -7,7 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## NEXT - YYYY-MM-DD
 
 ### Added
-- Nothing
+- Support for `halaxa/json-machine: ^0.8|^1.0` 
 
 ### Deprecated
 - Nothing
@@ -16,7 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Nothing
 
 ### Removed
-- Nothing
+- Support for `halaxa/json-machine: ^0.7`
 
 ### Security
 - Nothing

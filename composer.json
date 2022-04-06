@@ -20,7 +20,7 @@
     }],
     "require": {
         "php": "^7.2||^8.0",
-        "halaxa/json-machine": "^0.7",
+        "halaxa/json-machine": "^0.8|^1.0",
         "illuminate/support": ">=6.0"
     },
     "suggest": {

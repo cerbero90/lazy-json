@@ -3,7 +3,7 @@
 namespace Cerbero\LazyJson\Handlers;
 
 use Cerbero\LazyJson\Concerns\JsonPointerAware;
-use JsonMachine\JsonMachine;
+use JsonMachine\Items;
 use Traversable;
 
 /**
@@ -34,6 +34,6 @@ class Filename implements Handler
      */
     public function handle($source, string $path): Traversable
     {
-        return JsonMachine::fromFile($source, $this->toJsonPointer($path));
+        return Items::fromFile($source, ['pointer' => $this->toJsonPointer($path)]);
     }
 }
