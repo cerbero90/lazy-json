@@ -6,7 +6,7 @@ use Cerbero\LazyJson\Exceptions\LazyJsonException;
 use Cerbero\LazyJson\Handlers\Endpoint;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response as Psr7Response;
-use JsonMachine\JsonMachine;
+use JsonMachine\Items;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -54,7 +54,7 @@ class EndpointTest extends TestCase
 
         $handled = (new Endpoint())->handle('https://endpoint.test', '');
 
-        $this->assertInstanceOf(JsonMachine::class, $handled);
+        $this->assertInstanceOf(Items::class, $handled);
 
         foreach ($handled as $key => $value) {
             $this->assertSame('end', $key);
@@ -73,7 +73,7 @@ class EndpointTest extends TestCase
 
         $handled = (new Endpoint())->handle('https://endpoint.test', 'foo.bar');
 
-        $this->assertInstanceOf(JsonMachine::class, $handled);
+        $this->assertInstanceOf(Items::class, $handled);
 
         foreach ($handled as $key => $value) {
             $this->assertSame('bar', $key);
