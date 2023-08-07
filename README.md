@@ -2,8 +2,6 @@
 
 [![Author][ico-author]][link-author]
 [![PHP Version][ico-php]][link-php]
-[![Laravel Version][ico-laravel]][link-laravel]
-[![Octane Compatibility][ico-octane]][link-octane]
 [![Build Status][ico-actions]][link-actions]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
@@ -15,7 +13,11 @@
 
 Framework-agnostic package to load JSONs of any dimension and from any source into [Laravel lazy collections](https://laravel.com/docs/collections#lazy-collections).
 
-Under the hood, [🧩 JSON Parser](https://github.com/cerbero90/json-parser) is used to parse and extract sub-trees from any JSON.
+Lazy JSON recursively turns any JSON array and object into a lazy collection, consuming only a few KB of memory while parsing JSON of any size.
+
+It optionally allows to extract only some sub-trees, instead of the whole JSON, with a simple dot-notation syntax.
+
+Under the hood, [🧩 JSON Parser](https://github.com/cerbero90/json-parser) is used to parse any JSON and extract sub-trees.
 
 Need to lazy load items from paginated JSON APIs? Consider using [🐼 Lazy JSON Pages](https://github.com/cerbero90/lazy-json-pages) instead.
 
@@ -30,62 +32,39 @@ composer require cerbero/lazy-json
 
 ## 🔮 Usage
 
-Loading JSON in lazy collections is possible by using the collection itself or the included helper:
+Depending on our code style, we can call Lazy JSON in 3 different ways:
 
 ```php
-LazyCollection::fromJson($source);
+use Cerbero\LazyJson\LazyJson;
+use Illuminate\Support\LazyCollection;
+use function Cerbero\LazyJson\lazyJson;
 
-lazyJson($source);
+// auto-registered lazy collection macro
+$lazyCollection = LazyCollection::fromJson($source);
+
+// static method
+$lazyCollection = LazyJson::from($source);
+
+// namespaced helper
+$lazyCollection = lazyJson($source);
 ```
 
-The following are the supported JSON sources:
+The variable `$source` in the above examples indicates any data point that provides a JSON. A wide range of sources are supported by default:
+- **strings**, e.g. `{"foo":"bar"}`
+- **iterables**, i.e. arrays or instances of `Traversable`
+- **file paths**, e.g. `/path/to/large.json`
+- **resources**, e.g. streams
+- **API endpoint URLs**, e.g. `https://endpoint.json` or any instance of `Psr\Http\Message\UriInterface`
+- **PSR-7 requests**, i.e. any instance of `Psr\Http\Message\RequestInterface`
+- **PSR-7 messages**, i.e. any instance of `Psr\Http\Message\MessageInterface`
+- **PSR-7 streams**, i.e. any instance of `Psr\Http\Message\StreamInterface`
+- **Laravel HTTP client requests**, i.e. any instance of `Illuminate\Http\Client\Request`
+- **Laravel HTTP client responses**, i.e. any instance of `Illuminate\Http\Client\Response`
+- **user-defined sources**, i.e. any instance of `Cerbero\JsonParser\Sources\Source`
 
-```php
-$source = '{"foo":"bar"}'; // JSON string
-$source = ['{"foo":"bar"}']; // any iterable containing JSON, i.e. array or Traversable
-$source = 'https://foo.test/endpoint'; // endpoint
-$source = Http::get('https://foo.test/endpoint'); // Laravel HTTP client response
-$source = '/path/to/file.json'; // JSON file
-$source = fopen('/path/to/file.json', 'rb'); // any resource
-$source = <Psr\Http\Message\MessageInterface>; // any PSR-7 message, e.g. Guzzle response
-$source = <Psr\Http\Message\StreamInterface>; // any PSR-7 stream
-```
+For more information about JSON sources, please consult the [🧩 JSON Parser documentation](https://github.com/cerbero90/json-parser).
 
-Optionally, you can define a dot-noted path to extract only a sub-tree of the JSON. For example, given the following JSON:
-
-```json
-{
-    "data": [
-        {
-            "name": "Team 1",
-            "users": [
-                {
-                    "id": 1
-                },
-                {
-                    "id": 2
-                }
-            ]
-        },
-        {
-            "name": "Team 2",
-            "users": [
-                {
-                    "id": 3
-                }
-            ]
-        }
-    ]
-}
-```
-
-defining the path `data.*.users.*.id` would iterate only user IDs:
-
-```php
-$ids = lazyJson($source, 'data.*.users.*.id')
-    ->filter(fn ($id) => $id % 2 == 0)
-    ->all();
-```
+// @todo: complete README
 
 ## 📆 Change log
 
@@ -116,8 +95,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-author]: https://img.shields.io/static/v1?label=author&message=cerbero90&color=50ABF1&logo=twitter&style=flat-square
 [ico-php]: https://img.shields.io/packagist/php-v/cerbero/lazy-json?color=%234F5B93&logo=php&style=flat-square
-[ico-laravel]: https://img.shields.io/static/v1?label=laravel&message=%E2%89%A56.20&color=ff2d20&logo=laravel&style=flat-square
-[ico-octane]: https://img.shields.io/static/v1?label=octane&message=compatible&color=ff2d20&logo=laravel&style=flat-square
 [ico-version]: https://img.shields.io/packagist/v/cerbero/lazy-json.svg?label=version&style=flat-square
 [ico-actions]: https://img.shields.io/github/actions/workflow/status/cerbero90/json-parser/build.yml?branch=master&style=flat-square&logo=github
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
@@ -129,8 +106,6 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [link-author]: https://twitter.com/cerbero90
 [link-php]: https://www.php.net
-[link-laravel]: https://laravel.com
-[link-octane]: https://github.com/laravel/octane
 [link-packagist]: https://packagist.org/packages/cerbero/lazy-json
 [link-actions]: https://github.com/cerbero90/lazy-json/actions?query=workflow%3Abuild
 [link-per]: https://www.php-fig.org/per/coding-style/
