@@ -1,8 +1,8 @@
 <?php
 
-use Cerbero\LazyJson\Macro;
+use Cerbero\LazyJson\LazyJson;
 use Illuminate\Support\LazyCollection;
 
 (static function () {
-    LazyCollection::macro('fromJson', new Macro());
+    LazyCollection::macro('fromJson', [LazyJson::class, 'from']);
 })();
