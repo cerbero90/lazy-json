@@ -1,45 +1,62 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "uses()" function to bind a different classes or traits.
-|
-*/
+use Cerbero\JsonParser\Tokens\Parser;
+use Illuminate\Support\LazyCollection;
+use Pest\Expectation;
 
-// uses(Tests\TestCase::class)->in('Feature');
+if (!function_exists('fixture')) {
+    function fixture(string $fixture): string
+    {
+        return __DIR__ . "/fixtures/{$fixture}";
+    }
+}
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
+/**
+ * Expect the given sequence from a Traversable
+ * Temporary fix to sequence() until this PR is merged: https://github.com/pestphp/pest/pull/895
+ *
+ * @param mixed ...$callbacks
+ * @return Expectation
+ */
+expect()->extend('traverse', function (mixed ...$callbacks) {
+    if (! is_iterable($this->value)) {
+        throw new BadMethodCallException('Expectation value is not iterable.');
+    }
 
-// expect()->extend('toBeOne', function () {
-//     return $this->toBe(1);
-// });
+    if (empty($callbacks)) {
+        throw new InvalidArgumentException('No sequence expectations defined.');
+    }
 
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
+    $index = $valuesCount = 0;
 
-// function something()
-// {
-//     // ..
-// }
+    foreach ($this->value as $key => $value) {
+        $valuesCount++;
+
+        if ($callbacks[$index] instanceof Closure) {
+            $callbacks[$index](new self($value), new self($key));
+        } else {
+            (new self($value))->toEqual($callbacks[$index]);
+        }
+
+        $index = isset($callbacks[$index + 1]) ? $index + 1 : 0;
+    }
+
+    if (count($callbacks) > $valuesCount) {
+        throw new OutOfRangeException('Sequence expectations are more than the iterable items');
+    }
+
+    return $this;
+});
+
+/**
+ * Expect that all Parser instances are wrapped recursively into lazy collections
+ *
+ * @return Expectation
+ */
+expect()->extend('toBeWrappedIntoLazyCollection', function () {
+    return $this->when(is_object($this->value), fn (Expectation $value) => $value
+        ->toBeInstanceOf(LazyCollection::class)
+        ->not->toBeInstanceOf(Parser::class)
+        ->traverse(fn (Expectation $value) => $value->toBeWrappedIntoLazyCollection())
+    );
+});
