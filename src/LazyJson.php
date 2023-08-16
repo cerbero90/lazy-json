@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Cerbero\LazyJson;
 
-use Cerbero\JsonParser\Exceptions\JsonParserException;
 use Cerbero\JsonParser\JsonParser;
 use Cerbero\JsonParser\Tokens\Parser;
 use Cerbero\LazyJson\Exceptions\LazyJsonException;
