@@ -69,8 +69,19 @@ jobs:
         name: Linting
 
         steps:
-            - uses: actions/checkout@v3
-            - name: Duster Lint
-              uses: tighten/duster-action@v2
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
               with:
-                  args: lint -u tlint,phpcodesniffer,pint,phpstan
+                  php-version: ${{ matrix.php }}
+                  tools: composer:v2
+                  coverage: none
+
+            - name: Install dependencies
+              run: |
+                  composer update --prefer-stable --prefer-dist --no-interaction
+
+            - name: Execute Duster
+              run: vendor/bin/duster lint -u tlint,phpcodesniffer,pint,phpstan
