@@ -11,13 +11,22 @@
 [![PER][ico-per]][link-per]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Framework-agnostic package to load JSONs of any dimension and from any source into [Laravel lazy collections](https://laravel.com/docs/collections#lazy-collections).
+```php
+LazyCollection::fromJson($source, 'data.*.users.*')
+    ->map($this->mapToUser(...))
+    ->filter($this->filterUser(...))
+    ->values()
+    ->chunk(1_000)
+    ->each($this->storeUsersChunk(...));
+```
 
-Lazy JSON recursively turns any JSON array and object into a lazy collection, consuming only a few KB of memory while parsing JSON of any size.
+Framework-agnostic package to load JSON of any size and from any source into [Laravel lazy collections](https://laravel.com/docs/collections#lazy-collections).
 
-It optionally allows to extract only some sub-trees, instead of the whole JSON, with a simple dot-notation syntax.
+Lazy JSON recursively turns any JSON array and object into a lazy collection, consuming only a few KB of memory while parsing JSON of any dimension.
 
-Under the hood, [🧩 JSON Parser](https://github.com/cerbero90/json-parser) is used to parse any JSON and extract sub-trees.
+It optionally allows to extract only some sub-trees, instead of the whole JSON, with an easy dot-notation syntax.
+
+Under the hood, [🧩 JSON Parser](https://github.com/cerbero90/json-parser) is used to parse JSONs and extract sub-trees.
 
 Need to lazy load items from paginated JSON APIs? Consider using [🐼 Lazy JSON Pages](https://github.com/cerbero90/lazy-json-pages) instead.
 
@@ -32,11 +41,12 @@ composer require cerbero/lazy-json
 
 ## 🔮 Usage
 
-Depending on our code style, we can call Lazy JSON in 3 different ways:
+Depending on our coding style, we can call Lazy JSON in 3 different ways:
 
 ```php
 use Cerbero\LazyJson\LazyJson;
 use Illuminate\Support\LazyCollection;
+
 use function Cerbero\LazyJson\lazyJson;
 
 // auto-registered lazy collection macro
@@ -64,7 +74,20 @@ The variable `$source` in the above examples indicates any data point that provi
 
 For more information about JSON sources, please consult the [🧩 JSON Parser documentation](https://github.com/cerbero90/json-parser).
 
-// @todo: complete README
+If we only need a sub-tree of a large JSON, we can define the path to extract by using a simple dot-notation syntax.
+
+Consider [this JSON](https://randomuser.me/api/1.4?seed=json-parser&results=5) for example. To extract only the cities and avoid parsing the rest of the JSON, we can set the `results.*.location.city` dot-notation:
+
+```php
+$source = 'https://randomuser.me/api/1.4?seed=json-parser&results=5';
+
+LazyCollection::fromJson($source, 'results.*.location.city')->each(function (string $value, string $key) {
+    // 1st iteration: $key === 'city', $value === 'Sontra'
+    // 2nd iteration: $key === 'city', $value === 'San Rafael Tlanalapan'
+    // 3rd iteration: $key === 'city', $value === 'گرگان'
+    // ...
+});
+```
 
 ## 📆 Change log
 
