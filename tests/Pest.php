@@ -14,9 +14,6 @@ if (!function_exists('fixture')) {
 /**
  * Expect the given sequence from a Traversable
  * Temporary fix to sequence() until this PR is merged: https://github.com/pestphp/pest/pull/895
- *
- * @param mixed ...$callbacks
- * @return Expectation
  */
 expect()->extend('traverse', function (mixed ...$callbacks) {
     if (! is_iterable($this->value)) {
@@ -50,8 +47,6 @@ expect()->extend('traverse', function (mixed ...$callbacks) {
 
 /**
  * Expect that all Parser instances are wrapped recursively into lazy collections
- *
- * @return Expectation
  */
 expect()->extend('toBeWrappedIntoLazyCollection', function () {
     return $this->when(is_object($this->value), fn (Expectation $value) => $value

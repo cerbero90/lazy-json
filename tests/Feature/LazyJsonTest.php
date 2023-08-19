@@ -40,6 +40,50 @@ it('wraps JSON objects and arrays into lazy collections', function () {
         ->traverse(fn (Expectation $value) => $value->toBeWrappedIntoLazyCollection());
 });
 
-// it('sets a JSON pointer by using the dot notation syntax', function (string $source, string|int $dot, mixed $sequence) {
-//     expect(LazyJson::from($source, (string) $dot))->sequence($sequence);
-// })->with(Dataset::forDots());
+it('turns dot notation into JSON pointers correctly', function (string $source, string|int $dot, mixed $sequence) {
+    expect(LazyJson::from($source, (string) $dot))->sequence($sequence);
+})->with(Dataset::forDots());
+
+it('sets a callable JSON pointer by using the dot notation syntax', function () {
+    $dots = [
+        'foo' => function ($value, $key) {
+            expect($key)->toBe('foo')->and($value)->toBeInstanceOf(LazyCollection::class)->values()->all()->toBe([1, 2]);
+            return 'foo closure was run';
+        },
+        'bar' => function ($value, $key) {
+            expect($key)->toBe('bar')->and($value)->toBeInstanceOf(LazyCollection::class)->all()->toBe([3, 4]);
+            return 'bar closure was run';
+        },
+    ];
+
+    expect(LazyJson::from('{"foo":{"one":1,"two":2},"bar":[3,4]}', $dots))->traverse(
+        fn (Expectation $value, Expectation $key) => $key->toBe('foo')->and($value)->toBe('foo closure was run'),
+        fn (Expectation $value, Expectation $key) => $key->toBe('bar')->and($value)->toBe('bar closure was run'),
+    );
+});
+
+it('sets a JSON pointer by using the dot notation syntax', function (string $source, string $dot, array $expectedValuesByKey) {
+    $actualValues = [];
+    $expectedKey = key($expectedValuesByKey);
+    $expectedValues = reset($expectedValuesByKey);
+
+    expect(LazyJson::from($source, $dot))
+        ->traverse(function (Expectation $value, Expectation $key) use (&$actualValues, $expectedKey) {
+            $key->toBe($expectedKey)->and($value)->toBeInstanceOf(LazyCollection::class);
+            $actualValues[] = $value->value->toArray();
+        });
+
+    expect($actualValues)->toBe($expectedValues);
+})->with(Dataset::forSingleDots());
+
+it('sets JSON pointers by using the dot notation syntax', function (string $source, array $dots, array $expectedValuesByKey) {
+    $actualValues = [];
+
+    expect(LazyJson::from($source, $dots))
+        ->traverse(function (Expectation $value, Expectation $key) use (&$actualValues) {
+            $value->toBeInstanceOf(LazyCollection::class);
+            $actualValues[$key->value][] = $value->value->toArray();
+        });
+
+    expect($actualValues)->toBe($expectedValuesByKey);
+})->with(Dataset::forMultipleDots());

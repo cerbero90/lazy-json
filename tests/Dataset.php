@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Cerbero\LazyJson;
 
 use Generator;
-use Illuminate\Support\LazyCollection;
 
 final class Dataset
 {
@@ -17,26 +16,30 @@ final class Dataset
         foreach ($simpleObject as $key => $value) {
             yield [$source, $key, $value];
         }
+    }
 
+    public static function forSingleDots(): Generator
+    {
         $singleDot = require fixture('single_dot.php');
 
         foreach ($singleDot as $fixture => $subtreeByDot) {
             $source = fixture("{$fixture}.json");
 
-            foreach ($subtreeByDot as $dot => $subtree) {
-                $values = (array) reset($subtree);
+            foreach ($subtreeByDot as $dot => $expectedValuesByKey) {
+                yield [$source, $dot, $expectedValuesByKey];
+            }
+        }
+    }
 
-                foreach ($values as $expected) {
-                    yield [
-                        $source,
-                        $dot,
-                        fn ($value, $key) => $key->toBe(key($subtree))
-                            ->and($value)
-                            ->when(is_array($expected), fn ($value) => $value->toBeInstanceOf(LazyCollection::class))
-                            ->and(is_array($expected) ? $value->value->toArray() : $value)
-                            ->toBe($expected),
-                    ];
-                }
+    public static function forMultipleDots(): Generator
+    {
+        $singleDot = require fixture('multiple_dots.php');
+
+        foreach ($singleDot as $fixture => $subtreeByDots) {
+            $source = fixture("{$fixture}.json");
+
+            foreach ($subtreeByDots as $dots => $expectedValuesByKey) {
+                yield [$source, explode(',', $dots), $expectedValuesByKey];
             }
         }
     }
