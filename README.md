@@ -41,6 +41,13 @@ composer require cerbero/lazy-json
 
 ## 🔮 Usage
 
+* [👣 Basics](#-basics)
+* [💧 Sources](#-sources)
+* [🎯 Dots](#-dots)
+
+
+### 👣 Basics
+
 Depending on our coding style, we can call Lazy JSON in 3 different ways:
 
 ```php
@@ -59,7 +66,10 @@ $lazyCollection = LazyJson::from($source);
 $lazyCollection = lazyJson($source);
 ```
 
-The variable `$source` in the above examples indicates any data point that provides a JSON. A wide range of sources are supported by default:
+
+### 💧 Sources
+
+A JSON source is any data point that provides a JSON. A wide range of sources are supported by default:
 - **strings**, e.g. `{"foo":"bar"}`
 - **iterables**, i.e. arrays or instances of `Traversable`
 - **file paths**, e.g. `/path/to/large.json`
@@ -73,6 +83,9 @@ The variable `$source` in the above examples indicates any data point that provi
 - **user-defined sources**, i.e. any instance of `Cerbero\JsonParser\Sources\Source`
 
 For more information about JSON sources, please consult the [🧩 JSON Parser documentation](https://github.com/cerbero90/json-parser).
+
+
+### 🎯 Dots
 
 If we only need a sub-tree of a large JSON, we can define the path to extract by using a simple dot-notation syntax.
 
@@ -88,6 +101,11 @@ LazyCollection::fromJson($source, 'results.*.location.city')->each(function (str
     // ...
 });
 ```
+
+The dot-notation syntax is very simple and it can include any of the following 3 elements:
+- a key of a JSON object, e.g. `results`
+- an asterisk to indicate all items within an array, e.g. `results.*`
+- a dot to indicate the nesting level within a JSON, e.g. `results.*.location`
 
 ## 📆 Change log
 
