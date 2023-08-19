@@ -66,6 +66,15 @@ $lazyCollection = LazyJson::from($source);
 $lazyCollection = lazyJson($source);
 ```
 
+Once the [JSON source](#-sources) is set, we can chain any method of the [Laravel lazy collection](https://laravel.com/docs/collections#lazy-collections) to process the JSON in a memory-efficient way:
+
+```php
+LazyCollection::fromJson($source)
+    ->map(/* ... */)
+    ->where(/* ... */)
+    ->each(/* ... */);
+```
+
 
 ### 💧 Sources
 
@@ -87,9 +96,9 @@ For more information about JSON sources, please consult the [🧩 JSON Parser do
 
 ### 🎯 Dots
 
-If we only need a sub-tree of a large JSON, we can define the path to extract by using a simple dot-notation syntax.
+If we only need a sub-tree of a large JSON, we can use a simple dot-notation syntax to extract the desired path (or **dot**).
 
-Consider [this JSON](https://randomuser.me/api/1.4?seed=json-parser&results=5) for example. To extract only the cities and avoid parsing the rest of the JSON, we can set the `results.*.location.city` dot-notation:
+Consider [this JSON](https://randomuser.me/api/1.4?seed=json-parser&results=5) for example. To extract only the cities and avoid parsing the rest of the JSON, we can set the `results.*.location.city` dot:
 
 ```php
 $source = 'https://randomuser.me/api/1.4?seed=json-parser&results=5';
