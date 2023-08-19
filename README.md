@@ -103,7 +103,9 @@ Consider [this JSON](https://randomuser.me/api/1.4?seed=json-parser&results=5) f
 ```php
 $source = 'https://randomuser.me/api/1.4?seed=json-parser&results=5';
 
-LazyCollection::fromJson($source, 'results.*.location.city')->each(function (string $value, string $key) {
+$dot = 'results.*.location.city';
+
+LazyCollection::fromJson($source, $dot)->each(function (string $value, string $key) {
     // 1st iteration: $key === 'city', $value === 'Sontra'
     // 2nd iteration: $key === 'city', $value === 'San Rafael Tlanalapan'
     // 3rd iteration: $key === 'city', $value === 'گرگان'
@@ -117,10 +119,9 @@ The dot-notation syntax is very simple and it can include any of the following 4
 - a dot to indicate the nesting level within a JSON, e.g. `results.0`
 - an asterisk to indicate all items within an array, e.g. `results.*`
 
-If we need to extract several sub-trees, we are in luck as Lazy JSON supports multiple dots:
+If we need to extract several sub-trees, Lazy JSON supports multiple dots:
 
 ```php
-$source = 'https://randomuser.me/api/1.4?seed=json-parser&results=5';
 $dots = ['results.*.gender', 'results.*.email'];
 
 LazyCollection::fromJson($source, $dots)->each(function (string $value, string $key) {
