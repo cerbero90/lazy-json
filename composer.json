@@ -23,7 +23,7 @@
         "illuminate/collections": ">=8.12"
     },
     "require-dev": {
-        "pestphp/pest": "^2.0",
+        "pestphp/pest": "^2.16",
         "phpstan/phpstan": "^1.9",
         "scrutinizer/ocular": "^1.8",
         "squizlabs/php_codesniffer": "^3.0",

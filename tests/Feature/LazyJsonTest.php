@@ -37,7 +37,7 @@ it('iterates through keys and values', function () {
 
 it('wraps JSON objects and arrays into lazy collections', function () {
     expect(LazyJson::from('{"foo":{"one":1,"two":2},"bar":[3,4]}'))
-        ->traverse(fn (Expectation $value) => $value->toBeWrappedIntoLazyCollection());
+        ->sequence(fn (Expectation $value) => $value->toBeWrappedIntoLazyCollection());
 });
 
 it('turns dot notation into JSON pointers correctly', function (string $source, string|int $dot, mixed $sequence) {
@@ -56,7 +56,7 @@ it('sets a callable JSON pointer by using the dot notation syntax', function () 
         },
     ];
 
-    expect(LazyJson::from('{"foo":{"one":1,"two":2},"bar":[3,4]}', $dots))->traverse(
+    expect(LazyJson::from('{"foo":{"one":1,"two":2},"bar":[3,4]}', $dots))->sequence(
         fn (Expectation $value, Expectation $key) => $key->toBe('foo')->and($value)->toBe('foo closure was run'),
         fn (Expectation $value, Expectation $key) => $key->toBe('bar')->and($value)->toBe('bar closure was run'),
     );
@@ -68,7 +68,7 @@ it('sets a JSON pointer by using the dot notation syntax', function (string $sou
     $expectedValues = reset($expectedValuesByKey);
 
     expect(LazyJson::from($source, $dot))
-        ->traverse(function (Expectation $value, Expectation $key) use (&$actualValues, $expectedKey) {
+        ->sequence(function (Expectation $value, Expectation $key) use (&$actualValues, $expectedKey) {
             $key->toBe($expectedKey)->and($value)->toBeInstanceOf(LazyCollection::class);
             $actualValues[] = $value->value->toArray();
         });
@@ -80,7 +80,7 @@ it('sets JSON pointers by using the dot notation syntax', function (string $sour
     $actualValues = [];
 
     expect(LazyJson::from($source, $dots))
-        ->traverse(function (Expectation $value, Expectation $key) use (&$actualValues) {
+        ->sequence(function (Expectation $value, Expectation $key) use (&$actualValues) {
             $value->toBeInstanceOf(LazyCollection::class);
             $actualValues[$key->value][] = $value->value->toArray();
         });
