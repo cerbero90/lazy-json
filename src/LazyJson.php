@@ -26,7 +26,7 @@ final class LazyJson implements IteratorAggregate
      */
     public static function from(mixed $source, string|array $dot = '*'): LazyCollection
     {
-        return new LazyCollection(fn () => yield from new self($source, (array) $dot));
+        return new LazyCollection(fn() => yield from new self($source, (array) $dot));
     }
 
     /**
@@ -36,7 +36,7 @@ final class LazyJson implements IteratorAggregate
     {
         $this->parser = JsonParser::parse($source)
             ->lazyPointers(DotsConverter::toPointers($dots))
-            ->wrap(fn (Parser $parser) => new LazyCollection(fn () => yield from $parser));
+            ->wrap(fn(Parser $parser) => new LazyCollection(fn() => yield from $parser));
     }
 
     /**
