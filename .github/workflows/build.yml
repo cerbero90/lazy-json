@@ -84,4 +84,4 @@ jobs:
                   composer update --prefer-stable --prefer-dist --no-interaction
 
             - name: Execute Duster
-              run: vendor/bin/duster lint -u tlint,phpcodesniffer,pint,phpstan
+              run: vendor/bin/duster lint -u tlint,phpcodesniffer,pint,phpstan -vvv
