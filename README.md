@@ -22,7 +22,7 @@ LazyCollection::fromJson($source, 'data.*.users.*')
 
 Framework-agnostic package to load JSON of any size and from any source into [Laravel lazy collections](https://laravel.com/docs/collections#lazy-collections).
 
-Lazy JSON recursively turns any JSON array and object into a lazy collection, consuming only a few KB of memory while parsing JSON of any dimension.
+Lazy JSON recursively turns any JSON array or object into a lazy collection, consuming only a few KB of memory while parsing JSON of any dimension.
 
 It optionally allows to extract only some sub-trees, instead of the whole JSON, with an easy dot-notation syntax.
 
@@ -66,10 +66,11 @@ $lazyCollection = LazyJson::from($source);
 $lazyCollection = lazyJson($source);
 ```
 
-Once the [JSON source](#-sources) is set, we can chain any method of the [Laravel lazy collection](https://laravel.com/docs/collections#lazy-collections) to process the JSON in a memory-efficient way:
+The variable `$source` in our examples represents any [JSON source](#-sources). Once we define the source, we can chain any method of the [Laravel lazy collection](https://laravel.com/docs/collections#lazy-collections) to process the JSON in a memory-efficient way:
 
 ```php
 LazyCollection::fromJson($source)
+    ->values()
     ->map(/* ... */)
     ->where(/* ... */)
     ->each(/* ... */);
